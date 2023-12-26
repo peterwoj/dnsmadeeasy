@@ -83,11 +83,15 @@ func (p *Provider) AppendRecords(ctx context.Context, zone string, records []lib
 		if idxFound := slices.IndexFunc(*zoneRecords, func(r Record) bool {
 			return r.Type == record.Type && r.Name == record.Name
 		}); idxFound == -1 {
+			ttlSeconds := int(record.TTL.Seconds())
+			if ttlSeconds < 300 {
+				ttlSeconds = 300
+			}
 			*appendRecords = append(*appendRecords, Record{
 				Type:        record.Type,
 				Name:        record.Name,
 				Value:       record.Value,
-				TTL:         int(record.TTL.Seconds()),
+				TTL:         ttlSeconds,
 				Priority:    record.Priority,
 				GtdLocation: "DEFAULT",
 			})
